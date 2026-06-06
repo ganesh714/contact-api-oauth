@@ -37,5 +37,8 @@ public class DeveloperUserDetails implements UserDetails{
 	public String getUsername() {
 		return developer.getUserName();
 	}
-
+	
+	public Developer getUser() {
+		return developer;
+	}
 }
