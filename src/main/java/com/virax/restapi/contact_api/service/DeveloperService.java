@@ -5,13 +5,18 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.virax.restapi.contact_api.dtos.DeveloperDto;
+import com.virax.restapi.contact_api.dtos.TokenUserDto;
 import com.virax.restapi.contact_api.mappers.DeveloperMapper;
 import com.virax.restapi.contact_api.model.Developer;
+import com.virax.restapi.contact_api.model.DeveloperUserDetails;
 import com.virax.restapi.contact_api.repository.DeveloperRespository;
 
 @Service
@@ -25,6 +30,12 @@ public class DeveloperService {
 	
 	@Autowired
 	private DeveloperMapper developerMapper; 
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private JwtService jwtService;
 	
 	public DeveloperDto addDeveloper(DeveloperDto developerDto) {
 		if (developerRespository.findById(developerDto.getId()).isPresent()) {
@@ -76,4 +87,21 @@ public class DeveloperService {
     	}
         developerRespository.deleteById(id);
     }
+
+	public String generateToken(TokenUserDto tokenUserDto) {
+		
+		Authentication authentication = authenticationManager.authenticate(
+			new UsernamePasswordAuthenticationToken(
+					tokenUserDto.getUserName(),
+					tokenUserDto.getPassword()
+			)
+		);
+		
+		if (authentication.isAuthenticated()) {
+			DeveloperUserDetails userDetails = (DeveloperUserDetails) authentication.getPrincipal();
+			Developer user = userDetails.getUser();
+			return jwtService.generateToken(user);
+		}
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"invalid details");
+	}
 }
