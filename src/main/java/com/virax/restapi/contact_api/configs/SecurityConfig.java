@@ -21,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.virax.restapi.contact_api.service.DeveloperUserDetailsService;
 
@@ -31,8 +32,9 @@ public class SecurityConfig {
 
 	@Autowired
 	DeveloperUserDetailsService developerUserDetailsService;
-
-
+	
+	@Autowired
+	JwtFilter jwtFilter;
 	@Bean
 	public SecurityFilterChain getSecurityFilterChain(HttpSecurity http) throws Exception {
 
@@ -46,6 +48,7 @@ public class SecurityConfig {
 								).permitAll()
 						.anyRequest().authenticated()) 
 				.httpBasic(Customizer.withDefaults())
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
 
