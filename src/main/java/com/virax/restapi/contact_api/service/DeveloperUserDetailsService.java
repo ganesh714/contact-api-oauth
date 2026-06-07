@@ -18,7 +18,7 @@ public class DeveloperUserDetailsService implements UserDetailsService{
 	DeveloperRespository developerRespository;
 	
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public DeveloperUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Developer dev = developerRespository.findByUserName(username);
 		if (dev == null) {
 			throw new UsernameNotFoundException(username);
