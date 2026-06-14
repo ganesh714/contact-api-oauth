@@ -35,6 +35,10 @@ public class SecurityConfig {
 	
 	@Autowired
 	JwtFilter jwtFilter;
+	
+	@Autowired
+	Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
+	
 	@Bean
 	public SecurityFilterChain getSecurityFilterChain(HttpSecurity http) throws Exception {
 
@@ -44,10 +48,13 @@ public class SecurityConfig {
 						.requestMatchers(
 								"/api/developers/add",
 								"/generateToken",
-								"/user/login"
+								"/user/login",
+								"/login/**",
+								"/oauth2/**"
 								).permitAll()
 						.anyRequest().authenticated()) 
 				.httpBasic(Customizer.withDefaults())
+				.oauth2Login(oauth2 -> oauth2.successHandler(oauth2LoginSuccessHandler))
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
